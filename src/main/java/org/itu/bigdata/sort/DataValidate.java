@@ -3,7 +3,6 @@ package org.itu.bigdata.sort;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -13,12 +12,9 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.PureJavaCrc32;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
 import java.io.IOException;
-import java.util.zip.Checksum;
 
 /**
  * Created by kiran on 1/3/16.
@@ -131,7 +127,7 @@ public class DataValidate extends Configured implements Tool {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new TeraValidate(), args);
+        int res = ToolRunner.run(new Configuration(), new DataValidate(), args);
         System.exit(res);
     }
 }
