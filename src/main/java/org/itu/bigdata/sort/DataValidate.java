@@ -98,7 +98,7 @@ public class DataValidate extends Configured implements Tool {
     }
 
     private static void usage() throws IOException {
-        System.err.println("teravalidate <out-dir> <report-dir>");
+        System.err.println("datavalidate <out-dir> <report-dir>");
     }
 
     public int run(String[] args) throws Exception {
