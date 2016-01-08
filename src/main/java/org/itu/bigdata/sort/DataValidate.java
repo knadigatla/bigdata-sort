@@ -14,13 +14,19 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * Created by kiran on 1/3/16.
+ * this class is to validate the data, it compare row and its previous row whether they are in order.
+ * if it is not sorted it will make an entry in the output report else nothing will be written to report.
+ * It also compares the last row of part file to the first row of next part file.
  */
 public class DataValidate extends Configured implements Tool {
     private static final Text ERROR = new Text("error");
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataValidate.class);
 
     static class ValidateMapper extends Mapper<LongWritable,Text,Text,Text> {
         private Text lastVal;
@@ -97,15 +103,14 @@ public class DataValidate extends Configured implements Tool {
 
     }
 
-    private static void usage() throws IOException {
-        System.err.println("datavalidate <out-dir> <report-dir>");
-    }
 
     public int run(String[] args) throws Exception {
         Job job = Job.getInstance(getConf());
         if (args.length != 2) {
-            usage();
-            return 1;
+            System.out.printf("Usage: %s [generic options] <input data dirs> <output report dir>\n",
+                    getClass().getSimpleName());
+            ToolRunner.printGenericCommandUsage(System.out);
+            return -1;
         }
         TextInputFormat.setInputPaths(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));

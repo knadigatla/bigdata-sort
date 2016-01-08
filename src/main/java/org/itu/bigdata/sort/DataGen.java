@@ -1,8 +1,5 @@
 package org.itu.bigdata.sort;
 
-/**
- * Created by kiran on 1/3/16.
- */
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -12,13 +9,20 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is to generate the 100 byte lines(only Alphabets) Text Files
+ */
 public class DataGen extends Configured implements Tool {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataGen.class);
 
     public static final String NUM_ROWS = "mapreduce.datasort.num-rows";
 
@@ -79,7 +83,7 @@ public class DataGen extends Configured implements Tool {
             }
 
             public void close() throws IOException {
-                // NOTHING
+                // empty method
             }
 
             public LongWritable getCurrentKey() {
@@ -122,7 +126,7 @@ public class DataGen extends Configured implements Tool {
         public List<InputSplit> getSplits(JobContext job) {
             long totalRows = getNumberOfRows(job);
             int numSplits = job.getConfiguration().getInt("mapreduce.job.maps", 1);
-//            LOG.info("Generating " + totalRows + " using " + numSplits);
+            LOG.info("Generating " + totalRows + " using " + numSplits);
             List<InputSplit> splits = new ArrayList<InputSplit>();
             long currentRow = 0;
             for(int split = 0; split < numSplits; ++split) {
@@ -144,9 +148,6 @@ public class DataGen extends Configured implements Tool {
         job.getConfiguration().setLong(NUM_ROWS, numRows);
     }
 
-
-
-
     public static class DataGenMapper extends Mapper<LongWritable, NullWritable, Text, Text> {
 
         @Override
@@ -159,26 +160,16 @@ public class DataGen extends Configured implements Tool {
         }
     }
 
-
-
-
-
-
-
     public int run(String[] args) throws Exception {
-        // TODO Auto-generated method stub
         if(args.length != 2) {
             System.out.printf("Usage: %s [generic options] <number of 100 byte rows> <output dir>\n",
                     getClass().getSimpleName());
             ToolRunner.printGenericCommandUsage(System.out);
             return -1;
         }
-
-
         Job job = new Job(getConf());
         job.setJarByClass(DataGen.class);
         job.setJobName(getClass().getName());
-
         setNumberOfRows(job, Long.parseLong(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         job.setMapperClass(DataGenMapper.class);
@@ -187,10 +178,7 @@ public class DataGen extends Configured implements Tool {
         job.setInputFormatClass(DataInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
         job.setNumReduceTasks(0);
-        if(job.waitForCompletion(true)) {
-            return 0;
-        }
-        return 1;
+        return job.waitForCompletion(true) ? 0 : 1;
     }
 
     /**
