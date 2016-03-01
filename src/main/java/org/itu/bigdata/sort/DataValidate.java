@@ -114,7 +114,7 @@ public class DataValidate extends Configured implements Tool {
         }
         TextInputFormat.setInputPaths(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
-        job.setJobName("DataValidate");
+        job.setJobName(getClass().getName());
         job.setJarByClass(DataValidate.class);
         job.setMapperClass(ValidateMapper.class);
         job.setReducerClass(ValidateReducer.class);
